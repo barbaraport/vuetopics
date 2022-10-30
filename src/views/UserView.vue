@@ -1,5 +1,7 @@
 <template>
     <div id="usuario">
+        <p v-if="autorizacao === 'ROLE_ADMIN'">{{autorizacao}}</p>
+        <p>Nome: <input type="text" v-model="nome"> <button @click="atualizar"> Ok</button></p>
         <ul>
             <li v-for="(user, index) in users" :key="index">{{user.nome}}</li>
         </ul>
@@ -14,15 +16,20 @@ export default {
     name: 'userView',
     data() {
         return {
-            users: [{nome: 'Bárbara'}, {nome: 'Thomas'}]
+            nome: '',
+            users: [{}]
         }
     },
     computed: {
-        ...mapState(['token'])
+        ...mapState(['autorizacao'])
     },
     methods: {
         atualizar() {
-            axios.get('/usuario', {headers: {Authorization: this.token}})
+            let url = 'usuario';
+            if (this.nome) {
+                url = 'usuario/nome/' + this.nome;
+            }
+            axios.get(encodeURI(url), {headers: {Authorization: this.token}})
             .then(response => {
                 this.users = response.data;
             })
